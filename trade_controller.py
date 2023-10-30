@@ -5,6 +5,7 @@ import hmac
 import base64
 import os
 import time
+from typing import Optional, Union
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -56,12 +57,15 @@ class TradeController:
         return requests.get(url, params=params).json()
 
     @staticmethod
-    def get_ticker_info(pairs, url="https://api.kraken.com/0/public/Ticker"):
-        pairs_str = ",".join(pairs) if isinstance(pairs, list) else pairs
-        params = {
-            'pair': pairs_str
-        }
-        return requests.get(url, params=params).json()
+    def get_ticker_info(pairs: Optional[Union[list, str]], url="https://api.kraken.com/0/public/Ticker"):
+        if pairs:
+            pairs_str = ",".join(pairs) if isinstance(pairs, list) else pairs
+            params = {
+                'pair': pairs_str
+            }
+            return requests.get(url, params=params).json()
+        else:
+            return requests.get(url).json()
 
     @staticmethod
     def get_ohlc_data(pair, since, interval=1, url="https://api.kraken.com/0/public/OHLC"):
