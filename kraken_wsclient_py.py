@@ -9,6 +9,7 @@ from autobahn.twisted.websocket import WebSocketClientFactory, \
 from twisted.internet import reactor, ssl
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.error import ReactorAlreadyRunning
+import time
 
 
 class KrakenClientProtocol(WebSocketClientProtocol):

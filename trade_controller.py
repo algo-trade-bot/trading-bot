@@ -110,6 +110,28 @@ class TradeController:
         self.get_kraken_signature(uri, data=params)
         return requests.get(url, headers=self.headers, params=params).json()
 
+    def get_account_balance(self, cash_only=True, url="https://api.kraken.com/0/private/Balance", uri='/0/private/Balance'):
+        params = {
+            'nonce': self.generate_nonce()
+        }
+        self.get_kraken_signature(uri, data=params)
+        if cash_only:
+            return float(requests.post(url, headers=self.headers, data=params).json()['result']['ZUSD'])
+        return requests.post(url, headers=self.headers, data=params).json()
+
+    def add_order(self, pair, type, price, volume, order_type='limit', url="https://api.kraken.com/0/private/AddOrder",
+                  uri='/0/private/AddOrder'):
+        params = {
+            'nonce': self.generate_nonce(),
+            'pair': pair,
+            'ordertype': order_type,
+            'type': type,
+            'volume': volume,
+            'price': price
+        }
+        self.get_kraken_signature(uri, data=params)
+        return requests.post(url, headers=self.headers, data=params).json()
+
 
 if __name__ == '__main__':
     trade = TradeController()
