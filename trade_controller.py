@@ -21,6 +21,7 @@ class TradeController:
 
     @staticmethod
     def generate_nonce():
+        time.sleep(3)
         return int(time.time())
 
     def get_kraken_signature(self, uripath, data, secret=api_sec):
@@ -119,7 +120,7 @@ class TradeController:
             return float(requests.post(url, headers=self.headers, data=params).json()['result']['ZUSD'])
         return requests.post(url, headers=self.headers, data=params).json()
 
-    def add_order(self, pair, type, price, volume, order_type='limit', url="https://api.kraken.com/0/private/AddOrder",
+    def add_order(self, pair, type, volume, order_type='market', url="https://api.kraken.com/0/private/AddOrder",
                   uri='/0/private/AddOrder'):
         params = {
             'nonce': self.generate_nonce(),
@@ -127,7 +128,18 @@ class TradeController:
             'ordertype': order_type,
             'type': type,
             'volume': volume,
-            'price': price
+        }
+        self.get_kraken_signature(uri, data=params)
+        return requests.post(url, headers=self.headers, data=params).json()
+    
+    @staticmethod
+    def get_server_time(url='https://api.kraken.com/0/public/Time'):
+        return requests.get(url).json()['result']['unixtime']
+    
+    def query_orders(self, txid=None, url="https://api.kraken.com/0/private/QueryOrders", uri='/0/private/QueryOrders'):
+        params = {
+            'nonce': self.generate_nonce(),
+            'txid': txid
         }
         self.get_kraken_signature(uri, data=params)
         return requests.post(url, headers=self.headers, data=params).json()
@@ -135,4 +147,4 @@ class TradeController:
 
 if __name__ == '__main__':
     trade = TradeController()
-    print(trade.get_recent_spreads("BTC/USD", since=1616663618))
+    
